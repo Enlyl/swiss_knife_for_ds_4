@@ -1,6 +1,8 @@
 import http.server
 import json
 import os
+import subprocess
+import sys
 
 PORT = 8910
 
@@ -23,15 +25,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
+        length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(length)
+        try:
+            data = json.loads(body)
+        except Exception:
+            self._json({'success': False, 'error': 'Invalid JSON'})
+            return
         if self.path == '/api/create-project':
-            length = int(self.headers.get('Content-Length', 0))
-            body = self.rfile.read(length)
-            try:
-                data = json.loads(body)
-            except Exception:
-                self._json({'success': False, 'error': 'Invalid JSON'})
-                return
             self._create_project(data)
+        elif self.path == '/api/setup-env':
+            self._setup_env(data)
         else:
             self.send_response(404)
             self.end_headers()
@@ -48,10 +52,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
 
         try:
-            if os.path.exists(root_dir):
-                self._json({'success': False, 'error': 'Директория "%s" уже существует' % root_dir})
-                return
-
             os.makedirs(root_dir, exist_ok=True)
 
             dirs = flatten_structure(structure)
@@ -78,6 +78,63 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             })
             print('[create-project] %s -> %s (%d files, %d dirs)' % (
                 name, abs_path, len(written), len(dirs)))
+        except Exception as e:
+            self._json({'success': False, 'error': str(e)})
+
+    def _setup_env(self, data):
+        root_dir = data.get('rootDir', '').strip()
+        use_uv = data.get('useUv', False)
+        libraries = data.get('libraries', [])
+
+        if not root_dir or not os.path.isdir(root_dir):
+            self._json({'success': False, 'error': 'Директория не найдена'})
+            return
+
+        try:
+            output_lines = []
+            venv_path = os.path.join(root_dir, 'venv')
+
+            def run(cmd, cwd=None):
+                out = ''
+                try:
+                    res = subprocess.run(cmd, cwd=cwd or root_dir,
+                        capture_output=True, text=True, timeout=300,
+                        shell=True)
+                    if res.stdout:
+                        out += res.stdout.strip()
+                    if res.returncode != 0 and res.stderr:
+                        out += '\n' + res.stderr.strip()
+                    return out, res.returncode
+                except subprocess.TimeoutExpired:
+                    return 'Timeout', -1
+                except Exception as e:
+                    return str(e), -1
+
+            if use_uv:
+                out1, rc1 = run('uv venv')
+                output_lines.append('uv venv: %s' % out1)
+                if rc1 == 0:
+                    out2, rc2 = run('uv pip install %s' % ' '.join(libraries))
+                    output_lines.append('uv pip install: %s' % out2)
+            else:
+                out1, rc1 = run('python -m venv venv')
+                output_lines.append('python -m venv venv: %s' % out1)
+                if rc1 == 0:
+                    pip_path = os.path.join(venv_path, 'Scripts', 'pip')
+                    if os.path.exists(pip_path):
+                        out2, rc2 = run('"%s" install %s' % (pip_path, ' '.join(libraries)))
+                        output_lines.append('pip install: %s' % out2)
+
+            success = True
+            for line in output_lines:
+                if 'Error' in line or 'error' in line:
+                    success = False
+
+            print('[setup-env] %s -> %s' % (root_dir, 'ok' if success else 'fail'))
+            self._json({
+                'success': success,
+                'output': '\n'.join(output_lines)
+            })
         except Exception as e:
             self._json({'success': False, 'error': str(e)})
 

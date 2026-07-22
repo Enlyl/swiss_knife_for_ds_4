@@ -152,7 +152,7 @@
           '<input type="text" class="input" id="wizRootDir" value="' + escHtml(_state.rootDir) + '" placeholder="~/projects/' + escHtml(_state.name || 'my_project') + '" style="flex:1">' +
           '<button class="btn btn-secondary" id="wizBrowseBtn" title="Выбрать папку"><i class="fas fa-folder-open"></i></button>' +
         '</div>' +
-        '<div class="form-hint">Папка, где будет создан проект. Нажмите на кнопку папки для выбора.</div></div>' +
+        '<div class="form-hint">Полный путь к папке проекта, например C:\\Projects\\' + escHtml(_state.name || 'my_project') + ' (для создания venv и установки пакетов). Кнопка справа — записать файлы в выбранную папку.</div></div>' +
       '<div class="form-group">' +
         '<label class="form-label">Версия Python</label>' +
         '<select class="select" id="wizPython">' +
@@ -544,40 +544,56 @@
       App.events.emit('project:created', { project: project });
       App.ui.showToast('Проект "' + _state.name + '" создан в браузере', 'success');
 
-      // Создаём файлы на диске
+      // Создаём файлы на диске + виртуальное окружение
+      function postJSON(url, data, onOk, onErr) {
+        var x = new XMLHttpRequest();
+        x.open('POST', url, true);
+        x.setRequestHeader('Content-Type', 'application/json');
+        x.onload = function () {
+          try {
+            var r = JSON.parse(x.responseText);
+            if (r.success) { if (onOk) onOk(r); }
+            else { if (onErr) onErr(r.error || 'неизвестная ошибка'); }
+          } catch (e) { if (onErr) onErr('Ошибка ответа сервера'); }
+        };
+        x.onerror = function () { if (onErr) onErr('Сервер недоступен'); };
+        x.send(JSON.stringify(data));
+      }
+
+      var payload = {
+        name: _state.name,
+        rootDir: _state.rootDir,
+        files: project.generatedFiles || {},
+        structure: project.structure || [],
+        pythonVersion: _state.pythonVersion,
+        useUv: _state.useUv,
+        libraries: _state.selectedLibraries
+      };
+
+      // 1. Создаём файлы через сервер (если указан путь)
+      if (_state.rootDir) {
+        postJSON('/api/create-project', payload, function(res) {
+          App.ui.showToast('Проект сохранён в ' + res.path, 'success');
+          // 2. Сразу запускаем venv + pip install
+          postJSON('/api/setup-env', payload, function(res2) {
+            App.ui.showToast('Виртуальное окружение готово', 'success');
+          }, function(err2) {
+            App.ui.showToast('Окружение: ' + err2, 'warning');
+          });
+        }, function(err) {
+          App.ui.showToast('Ошибка записи: ' + err, 'error');
+        });
+      }
+
+      // 3. Если выбранная папка через Browse — дублируем файлы туда (FSA)
       if (_state.dirHandle) {
         writeProjectToHandle(_state.dirHandle, project).then(function() {
-          App.ui.showToast('Проект сохранён в папку', 'success');
+          App.ui.showToast('Файлы записаны в выбранную папку', 'success');
         }).catch(function(err) {
-          App.ui.showToast('Ошибка записи на диск: ' + err.message, 'error');
+          App.ui.showToast('Ошибка записи в папку: ' + err.message, 'error');
         });
-      } else if (_state.rootDir) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/create-project', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function () {
-          try {
-            var res = JSON.parse(xhr.responseText);
-            if (res.success) {
-              App.ui.showToast('Проект сохранён в ' + res.path, 'success');
-            } else {
-              App.ui.showToast('Ошибка записи на диск: ' + (res.error || 'неизвестная ошибка'), 'error');
-            }
-          } catch (e) {
-            App.ui.showToast('Ошибка при сохранении на диск', 'error');
-          }
-        };
-        xhr.onerror = function () {
-          App.ui.showToast('Не удалось сохранить проект на диск (сервер недоступен)', 'error');
-        };
-        var payload = JSON.stringify({
-          name: _state.name,
-          rootDir: _state.rootDir,
-          files: project.generatedFiles || {},
-          structure: project.structure || []
-        });
-        xhr.send(payload);
       }
+
       App.router.navigate('#dashboard');
     } else {
       App.ui.showToast('Ошибка при создании проекта', 'error');
