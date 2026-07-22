@@ -389,7 +389,14 @@
       html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">';
       html += '<h1 style="font-size:1.3rem;margin:0"><i class="fas fa-search" style="color:var(--accent);margin-right:8px"></i>Инспектор</h1>';
       html += '<div style="flex:1;max-width:300px">' + renderProjectSelector(project.id) + '</div>';
-      html += '</div></div>';
+      html += '</div>';
+      if (project.rootDir) {
+        html += '<div style="font-size:0.8rem;color:var(--text-muted);padding:4px 0 10px 0;display:flex;align-items:center;gap:6px;overflow:hidden">';
+        html += '<i class="fas fa-folder-open" style="flex-shrink:0;color:var(--warning)"></i>';
+        html += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escHtml(project.rootDir) + '">' + escHtml(project.rootDir) + '</span>';
+        html += '</div>';
+      }
+      html += '</div>';
       html += '<div class="split-view" style="flex:1;display:flex;border-top:1px solid var(--border);overflow:hidden">';
       html += '<div class="split-left" id="inspectorLeft" style="flex:0 0 35%;display:flex;flex-direction:column;padding:0;overflow:hidden">';
       html += '<div class="tabs" style="display:flex;flex-direction:column;height:100%">';
