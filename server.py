@@ -1,10 +1,8 @@
 import http.server
 import json
 import os
-import sys
-import shutil
 
-PORT = 8765
+PORT = 8910
 
 def flatten_structure(structure, prefix=''):
     dirs = []
@@ -16,7 +14,7 @@ def flatten_structure(structure, prefix=''):
                 dirs.extend(flatten_structure(item['children'], path))
     return dirs
 
-class ProjectHandler(http.server.SimpleHTTPRequestHandler):
+class Handler(http.server.SimpleHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -56,20 +54,18 @@ class ProjectHandler(http.server.SimpleHTTPRequestHandler):
 
             os.makedirs(root_dir, exist_ok=True)
 
-            # Создаём структуру папок из шаблона
             dirs = flatten_structure(structure)
             for d in dirs:
-                full = os.path.join(root_dir, d)
-                os.makedirs(full, exist_ok=True)
+                full_path = os.path.join(root_dir, d)
+                os.makedirs(full_path, exist_ok=True)
 
-            # Записываем файлы
             written = []
             for filepath, content in files.items():
-                full = os.path.join(root_dir, filepath)
-                parent = os.path.dirname(full)
+                full_path = os.path.join(root_dir, filepath)
+                parent = os.path.dirname(full_path)
                 if parent:
                     os.makedirs(parent, exist_ok=True)
-                with open(full, 'w', encoding='utf-8') as f:
+                with open(full_path, 'w', encoding='utf-8') as f:
                     f.write(content)
                 written.append(filepath)
 
@@ -95,11 +91,9 @@ class ProjectHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
 if __name__ == '__main__':
-    server = http.server.HTTPServer(('0.0.0.0', PORT), ProjectHandler)
-    print('Сервер запущен на http://localhost:%d' % PORT)
-    print('Нажмите Ctrl+C для остановки')
+    server = http.server.ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
+    print('http://127.0.0.1:%d' % PORT)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print('\nСервер остановлен')
         server.server_close()
