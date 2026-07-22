@@ -41,7 +41,7 @@
     _state = {
       step: 1, name: '', description: '', pythonVersion: '3.12',
       useUv: true, templateId: null, selectedLibraries: [], libraryFilter: '',
-      rootDir: ''
+      rootDir: '', dirHandle: null
     };
   }
 
@@ -385,6 +385,7 @@
       if (browseBtn && window.showDirectoryPicker) {
         browseBtn.addEventListener('click', function() {
           window.showDirectoryPicker({ mode: 'readwrite' }).then(function(handle) {
+            _state.dirHandle = handle;
             if (dirInput) dirInput.value = handle.name;
             _state.rootDir = handle.name;
           }).catch(function() {});
@@ -487,6 +488,40 @@
     renderWizard(_container);
   }
 
+  function writeProjectToHandle(handle, project) {
+    var files = project.generatedFiles || {};
+    var structure = project.structure || [];
+    return (async function() {
+      async function createDirs(items, parentHandle) {
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+          if (item.type === 'dir') {
+            var dirHandle = await parentHandle.getDirectoryHandle(item.name, { create: true });
+            if (item.children) {
+              await createDirs(item.children, dirHandle);
+            }
+          }
+        }
+      }
+      await createDirs(structure, handle);
+      var entries = Object.entries(files);
+      for (var j = 0; j < entries.length; j++) {
+        var filePath = entries[j][0];
+        var content = entries[j][1];
+        var parts = filePath.split('/');
+        var fileName = parts.pop();
+        var currentHandle = handle;
+        for (var k = 0; k < parts.length; k++) {
+          currentHandle = await currentHandle.getDirectoryHandle(parts[k], { create: true });
+        }
+        var fileHandle = await currentHandle.getFileHandle(fileName, { create: true });
+        var writable = await fileHandle.createWritable();
+        await writable.write(content);
+        await writable.close();
+      }
+    })();
+  }
+
   function createProject() {
     saveStepData();
     if (!_state.name) {
@@ -509,8 +544,14 @@
       App.events.emit('project:created', { project: project });
       App.ui.showToast('Проект "' + _state.name + '" создан в браузере', 'success');
 
-      // Создаём файлы на диске через сервер
-      if (_state.rootDir) {
+      // Создаём файлы на диске
+      if (_state.dirHandle) {
+        writeProjectToHandle(_state.dirHandle, project).then(function() {
+          App.ui.showToast('Проект сохранён в папку', 'success');
+        }).catch(function(err) {
+          App.ui.showToast('Ошибка записи на диск: ' + err.message, 'error');
+        });
+      } else if (_state.rootDir) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/create-project', true);
         xhr.setRequestHeader('Content-Type', 'application/json');

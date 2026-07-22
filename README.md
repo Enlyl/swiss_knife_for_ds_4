@@ -1,141 +1,154 @@
 # AI Project Companion
 
-**SPA-инструмент для управления проектами data science** — от идеи до деплоя. Генерация шаблонов, инспекция кода, анализ CSV, AI-рекомендации и трекинг прогресса в одном приложении.
+**SPA for managing data science projects** — from idea to deployment. Template generation, code inspection, CSV analysis, AI recommendations, and progress tracking in a single app.
 
 ---
 
-## Возможности
+## Features
 
-### Управление проектами
-- **Создание проектов** — пошаговый мастер (Wizard): имя, шаблон, библиотеки, настройки окружения
-- **Список проектов** — карточки с прогрессом, поиск, удаление
-- **Roadmap** — временная шкала этапов проекта с отметкой выполнения и AI-рекомендациями
-- **Инспектор файлов** — просмотр структуры проекта, зависимостей, конфигов и тестов с подсветкой синтаксиса
+### Project Management
+- **Project creation** — step-by-step wizard: name, template, libraries, environment setup
+- **Project list** — cards with progress, search, delete
+- **File inspector** — browse project structure, dependencies, configs, and tests with syntax highlighting
+- **Generators** — preview and download boilerplate files for any project
 
-### 10 встроенных шаблонов
+### 10 Built-in Templates
 
-| Шаблон | Уровень | Категория |
-|--------|---------|-----------|
-| Data Analysis | Начальный | Анализ данных |
-| Machine Learning | Средний | Машинное обучение |
-| NLP | Средний | Машинное обучение |
-| Computer Vision | Продвинутый | Глубокое обучение |
-| Kaggle Competition | Средний | Соревнования |
-| AI Agents | Продвинутый | AI/ML |
-| Dashboard (Streamlit) | Начальный | Визуализация |
-| FastAPI Service | Средний | Бэкенд |
-| Time Series | Средний | Анализ данных |
-| Recommendation System | Продвинутый | Машинное обучение |
+| Template | Level | Category |
+|---|---|---|
+| Data Analysis | Beginner | Data Analysis |
+| Machine Learning | Intermediate | Machine Learning |
+| NLP | Intermediate | Machine Learning |
+| Computer Vision | Advanced | Deep Learning |
+| Kaggle Competition | Intermediate | Competitions |
+| AI Agents | Advanced | AI/ML |
+| Dashboard (Streamlit) | Beginner | Visualization |
+| FastAPI Service | Intermediate | Backend |
+| Time Series | Intermediate | Data Analysis |
+| Recommendation System | Advanced | Machine Learning |
 
-### Генераторы файлов
-Генерация всех ключевых файлов для DS-проекта с предпросмотром:
-- `README.md` — документация проекта
-- `requirements.txt` — зависимости
-- `pyproject.toml` — метаданные и сборка
+### File Generators
+Generate all key files for a DS project with live preview:
+- `README.md` — project docs
+- `requirements.txt` — dependencies
+- `pyproject.toml` — metadata and build config
 - `.gitignore` — Python/DS
-- `Dockerfile` — multi-stage сборка
-- `docker-compose.yml` — сервис с healthcheck
+- `Dockerfile` — multi-stage build
+- `docker-compose.yml` — service with healthcheck
 - `.github/workflows/ci.yml` — CI pipeline (ruff, mypy, pytest, codecov)
-- `.vscode/settings.json` + `launch.json` — настройки редактора
-- `Makefile` — 8 целей (setup, test, lint, run, docker и др.)
-- `.env.example` — переменные окружения
+- `.vscode/settings.json` + `launch.json` — editor settings
+- `Makefile` — 8 targets (setup, test, lint, run, docker, etc.)
+- `.env.example` — environment variables
 
 ### CSV Viewer
-- Загрузка через drag & drop
-- Автоопределение типов колонок
-- Сортировка, поиск, пагинация
-- Построение графиков (bar, line, scatter, pie) через Chart.js
+- Drag & drop upload
+- Auto column type detection
+- Sorting, search, pagination
+- Chart.js plots (bar, line, scatter, pie)
 
 ### Code Viewer
-- Мультитабный просмотр кода
-- Подсветка синтаксиса для 7 языков: Python, JavaScript, HTML, CSS, JSON, YAML, Markdown
-- Открытие файлов или загрузка из проекта
-- Копирование и скачивание
+- Multi-tab code viewer
+- Syntax highlighting for 7 languages: Python, JavaScript, HTML, CSS, JSON, YAML, Markdown
+- Open files or load from project
+- Copy and download
 
 ### AI Assistant
-- Встроенный чат-бот с базой знаний по DS
-- Рекомендации библиотек по задачам
-- Объяснение шагов pipeline
-- Анализ проекта (health check, issues, suggestions)
-- Best practices по структуре проекта, тестированию, деплою
-- Трекинг эксперимента, MLOps, управление данными
-- FAQ по концепциям DS/ML (overfitting, transformers, RAG, data drift и др.)
+- Built-in chatbot with DS knowledge base
+- Library recommendations by task
+- Pipeline step explanations
+- Project analysis (health check, issues, suggestions)
+- Best practices for project structure, testing, deployment
+- Experiment tracking, MLOps, data management
+- DS/ML concepts FAQ (overfitting, transformers, RAG, data drift, etc.)
 
-### Система тем
-- **Тёмная / Светлая** темы
-- **5 категорий тем:** Gamer, Cosmic, Programmer, Retro, Techno
-- У каждой категории — уникальная цветовая палитра, шрифт и стили
+### Theme System
+- **Dark / Light** modes
+- **5 theme categories:** Gamer, Cosmic, Programmer, Retro, Techno
+- Each category has a unique color palette, font, and styles
 
-### Настройки
-- 25 иконок аватара в 5 стилях
-- 15 иконок логотипа в 5 стилях
-- Выбор языка: русский / английский
-- Настройки по умолчанию (Python, env manager)
-- Плагины с системой хуков
+### Settings
+- 25 avatar icons in 5 styles
+- 15 logo icons in 5 styles
+- Language: Russian / English
+- Default preferences (Python version, env manager)
 
-### Плагины
-Система расширений через `App.plugins.register()` с хуками:
+### Plugins
+Extension system via `App.plugins.register()` with hooks:
 - `onProjectCreate`, `onProjectOpen`, `onFileGenerate`
 - `onTemplateApply`, `onAnalysisStart`, `onAnalysisComplete`
 
 ### REST API (backend)
-`server.py` — Python HTTP-сервер на порту 8765 для создания файлов проекта на диске через `POST /api/create-project`.
+`server.py` — Python HTTP server on port 8765. Creates project files on disk via `POST /api/create-project`.
 
 ---
 
-## Технологии
+## Tech Stack
 
-| Компонент | Технология |
-|-----------|-----------|
-| Ядро | Vanilla JavaScript (ES5, IIFE) |
-| Стили | CSS Custom Properties, 4143 строки |
-| Иконки | Font Awesome 6.5.1 |
-| Графики | Chart.js 4.4.1 |
-| Шрифты | Inter, Orbitron, Space Grotesk, JetBrains Mono |
-| Бэкенд | Python 3 + http.server |
-| Фавикон | SVG (32×32) |
-| Хранилище | localStorage |
-| Зависимости | Нет сборщиков, нет npm |
+| Component | Technology |
+|---|---|
+| Core | Vanilla JavaScript (ES5, IIFE) |
+| Styles | CSS Custom Properties, ~4100 lines |
+| Icons | Font Awesome 6.5.1 |
+| Charts | Chart.js 4.4.1 |
+| Fonts | Inter, Orbitron, Space Grotesk, JetBrains Mono |
+| Backend | Python 3 + http.server |
+| Favicon | SVG (32×32) |
+| Storage | localStorage |
+| Dependencies | No bundlers, no npm |
 
 ---
 
-## Быстрый старт
+## Quick Start
 
 ```bash
-# 1. Откройте index.html в браузере (SPA без бэкенда)
-open index.html
-
-# 2. Или запустите с сервером для генерации файлов на диске
+# 1. Start the server (serves static files + API for disk writes)
 python server.py
-# Откройте http://localhost:8765
+
+# 2. Open http://localhost:8765 in your browser
 ```
+
+> Without the server the app still works (projects saved to browser localStorage), but files won't be written to disk.
 
 ---
 
-## Структура проекта
+## Project Structure
 
 ```
 .
 ├── index.html              # SPA shell
-├── favicon.svg             # Фавикон
-├── server.py               # HTTP-сервер для записи файлов
+├── favicon.svg             # Favicon
+├── server.py               # HTTP server (static + API)
+├── README.md               # This file
 ├── css/
-│   └── main.css            # Все стили (2 темы × 5 категорий)
+│   └── main.css            # All styles (2 themes × 5 categories)
 └── js/
     ├── core/
-    │   └── app.js          # Ядро: роутер, темы, события, состояние, плагины, UI
+    │   └── app.js          # Core: router, themes, events, state, plugins, UI
     ├── services/
-    │   └── services.js     # 5 сервисов: проекты, шаблоны, окружение, AI, файлы
+    │   └── services.js     # 5 services: projects, templates, env, AI, files
     └── components/
-        ├── dashboard.js    # Главная: статистика, быстрые действия, советы
-        ├── wizard.js       # Мастер создания проекта (4 шага)
-        ├── projects.js     # Список проектов
-        ├── roadmap.js      # Трекер этапов с AI-рекомендациями
-        ├── inspector.js    # Инспектор файлов и конфигов
-        ├── csv-viewer.js   # Просмотр и визуализация CSV
-        ├── code-viewer.js  # Просмотр кода с подсветкой
-        ├── generators.js   # Генерация файлов проекта
-        ├── templates.js    # Библиотека шаблонов
-        ├── plugins.js      # Менеджер плагинов
-        └── settings.js     # Настройки приложения
+        ├── dashboard.js    # Home: stats, quick actions, tips
+        ├── wizard.js       # Project creation wizard (3 steps)
+        ├── projects.js     # Project list with search
+        ├── inspector.js    # File & config inspector
+        ├── csv-viewer.js   # CSV viewer + charts
+        ├── code-viewer.js  # Code viewer with syntax highlighting
+        ├── generators.js   # Boilerplate file generators
+        ├── templates.js    # Template library browser
+        ├── plugins.js      # Plugin manager
+        └── settings.js     # App settings
+```
+
+---
+
+## Development
+
+No build step. Edit the JS/CSS files and refresh the browser.
+
+```bash
+# Lint check (if Node.js available)
+node -e "try { new Function(require('fs').readFileSync('js/core/app.js','utf8')); console.log('OK'); } catch(e) { console.log(e.message); }"
+
+# Python syntax check
+python -c "import ast; ast.parse(open('server.py').read()); print('OK')"
 ```
