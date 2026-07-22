@@ -1,23 +1,19 @@
 @echo off
-chcp 65001 >nul
+cd /d "%~dp0"
 title AI Project Companion
 
 echo ========================================
-echo   AI Project Companion — Data Science
+echo   AI Project Companion
 echo ========================================
 echo.
 
-:: Проверяем Python
-python --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [INFO] Python не найден. Открываю index.html напрямую...
-    start "" "index.html"
-    exit /b
-)
+:: Открываем site напрямую (всегда работает)
+start "" "index.html"
 
-:: Запускаем сервер
-echo [INFO] Запуск сервера на http://localhost:8765
-echo [INFO] Нажмите Ctrl+C для остановки
-echo.
-start "" "http://localhost:8765"
-python server.py
+:: Если есть Python — запускаем сервер в отдельном окне
+python --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo [OK] Сервер: http://localhost:8765
+    start "AI Server" /MIN python server.py
+    timeout /t 2 /nobreak >nul
+)
