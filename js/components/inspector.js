@@ -399,16 +399,18 @@
       html += '</div>';
       html += '<div class="split-view" style="flex:1;display:flex;border-top:1px solid var(--border);overflow:hidden">';
       html += '<div class="split-left" id="inspectorLeft" style="flex:0 0 35%;display:flex;flex-direction:column;padding:0;overflow:hidden">';
-      html += '<div style="flex:1;overflow-y:auto;padding:0">';
-      html += '<div style="padding:10px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px"><i class="fas fa-folder-tree" style="font-size:0.7rem"></i> Файлы</div>';
-      html += '<div style="padding:2px 12px 8px 12px">' + renderFileTree(structure, 0, '') + '</div>';
-      html += '<div style="padding:8px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px"><i class="fas fa-cubes" style="font-size:0.7rem"></i> Зависимости</div>';
-      html += '<div style="padding:2px 12px 8px 12px">' + renderDepsTab(project) + '</div>';
-      html += '<div style="padding:8px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px"><i class="fas fa-cog" style="font-size:0.7rem"></i> Конфиг</div>';
-      html += '<div style="padding:2px 12px 8px 12px">' + renderConfigTab(project) + '</div>';
-      html += '<div style="padding:8px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px"><i class="fas fa-vial" style="font-size:0.7rem"></i> Тесты</div>';
-      html += '<div style="padding:2px 12px 8px 12px">' + renderTestsTab(project) + '</div>';
-      html += '</div></div>';
+      html += '<div style="display:flex;border-bottom:1px solid var(--border);padding:0 8px;flex-shrink:0;background:var(--bg-secondary)">';
+      html += '<style>.inspector-tab:hover{color:var(--text-primary)!important;background:var(--bg-hover)!important}</style>';
+      html += '<button class="inspector-tab" data-panel="files" style="flex:1;border:none;background:var(--bg-active);padding:10px 4px;cursor:pointer;font-size:0.8rem;font-weight:500;color:var(--accent);transition:all 0.15s;position:relative;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-folder-tree" style="font-size:0.7rem"></i><span>Файлы</span></button>';
+      html += '<button class="inspector-tab" data-panel="deps" style="flex:1;border:none;background:none;padding:10px 4px;cursor:pointer;font-size:0.8rem;font-weight:500;color:var(--text-muted);transition:all 0.15s;position:relative;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-cubes" style="font-size:0.7rem"></i><span>Зависимости</span></button>';
+      html += '<button class="inspector-tab" data-panel="config" style="flex:1;border:none;background:none;padding:10px 4px;cursor:pointer;font-size:0.8rem;font-weight:500;color:var(--text-muted);transition:all 0.15s;position:relative;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-cog" style="font-size:0.7rem"></i><span>Конфиг</span></button>';
+      html += '<button class="inspector-tab" data-panel="tests" style="flex:1;border:none;background:none;padding:10px 4px;cursor:pointer;font-size:0.8rem;font-weight:500;color:var(--text-muted);transition:all 0.15s;position:relative;display:flex;align-items:center;justify-content:center;gap:5px"><i class="fas fa-vial" style="font-size:0.7rem"></i><span>Тесты</span></button>';
+      html += '</div>';
+      html += '<div class="inspector-panel active" data-panel="files" style="flex:1;overflow-y:auto;padding:6px 6px">' + renderFileTree(structure, 0, '') + '</div>';
+      html += '<div class="inspector-panel" data-panel="deps" style="flex:1;overflow-y:auto;padding:6px 12px;display:none">' + renderDepsTab(project) + '</div>';
+      html += '<div class="inspector-panel" data-panel="config" style="flex:1;overflow-y:auto;padding:6px 12px;display:none">' + renderConfigTab(project) + '</div>';
+      html += '<div class="inspector-panel" data-panel="tests" style="flex:1;overflow-y:auto;padding:6px 12px;display:none">' + renderTestsTab(project) + '</div>';
+      html += '</div>';
       html += '<div class="split-divider" id="inspectorDivider" style="flex:0 0 5px;cursor:col-resize;background:var(--border);border:none;margin:0;position:relative;z-index:10"></div>';
       html += '<div class="split-right" style="flex:1;padding:16px 20px;overflow-y:auto;min-width:0" id="inspectorFileViewer">';
       html += renderFileContent(project, null, null);
@@ -426,6 +428,22 @@
           App.router.navigate('#inspector');
         });
       }
+      container.querySelectorAll('.inspector-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var panel = this.getAttribute('data-panel');
+          container.querySelectorAll('.inspector-tab').forEach(function (t) {
+            t.style.color = 'var(--text-muted)';
+            t.style.background = 'none';
+          });
+          this.style.color = 'var(--accent)';
+          this.style.background = 'var(--bg-active)';
+          container.querySelectorAll('.inspector-panel').forEach(function (p) {
+            p.style.display = 'none';
+          });
+          var activePanel = container.querySelector('.inspector-panel[data-panel="' + panel + '"]');
+          if (activePanel) activePanel.style.display = '';
+        });
+      });
       container.querySelectorAll('.tree-folder').forEach(function (folder) {
         folder.addEventListener('click', function () {
           var children = this.nextElementSibling;
