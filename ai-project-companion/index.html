@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <meta name="description" content="AI Project Companion — professional data science project companion and assistant">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="color-scheme" content="dark light">
+  <title>AI Project Companion</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="app-container" id="app">
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <button class="btn btn-icon sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+          <div class="logo-icon">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div class="logo-text">
+            <span class="logo-title">AI Project Companion</span>
+            <span class="logo-subtitle">Data Science Assistant</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-center">
+        <div class="search-bar">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" placeholder="Search commands, templates, libraries..." id="globalSearch">
+          <kbd class="search-shortcut">Ctrl+K</kbd>
+          <div class="search-results" id="searchResults"></div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-icon" id="aiAssistantBtn" title="AI Assistant">
+          <i class="fas fa-robot"></i>
+        </button>
+        <button class="btn btn-icon" id="themeToggle" title="Toggle theme">
+          <i class="fas fa-moon"></i>
+        </button>
+        <div class="user-avatar" title="User">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="sidebar">
+      <nav class="sidebar-nav" id="sidebarNav">
+        <!-- Nav items injected by JS -->
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-item" id="pluginStatus">
+          <i class="fas fa-puzzle-piece"></i>
+          <span>Plugins: 0</span>
+        </div>
+        <div class="sidebar-footer-item" id="appVersion">
+          <i class="fas fa-code-branch"></i>
+          <span>v1.0.0</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <div class="app-content" id="appContent">
+        <!-- Page content rendered by JS -->
+      </div>
+    </main>
+
+    <!-- AI Assistant Panel -->
+    <div class="ai-panel" id="aiPanel">
+      <div class="ai-panel-header">
+        <span><i class="fas fa-robot"></i> AI Assistant</span>
+        <button class="btn btn-icon btn-sm" id="aiPanelClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="ai-panel-body" id="aiPanelBody">
+        <div class="ai-messages" id="aiMessages">
+          <div class="ai-message ai-message-assistant">
+            <div class="ai-message-avatar">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="ai-message-bubble">
+              Hello! I'm your AI Project Companion. Ask me anything about data science projects, libraries, or workflows.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-panel-footer">
+        <input type="text" class="input" id="aiInput" placeholder="Ask anything about DS projects...">
+        <button class="btn btn-icon btn-primary" id="aiSendBtn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header" id="modalHeader">
+        <h3 id="modalTitle">Modal</h3>
+        <button class="btn btn-icon btn-sm" id="modalClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <p>Modal content goes here.</p>
+      </div>
+      <div class="modal-footer" id="modalFooter">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/core/app.js"></script>
+  <script src="js/services/services.js"></script>
+  <script src="js/components/dashboard.js"></script>
+  <script src="js/components/wizard.js"></script>
+  <script src="js/components/projects.js"></script>
+  <script src="js/components/roadmap.js"></script>
+  <script src="js/components/inspector.js"></script>
+  <script src="js/components/csv-viewer.js"></script>
+  <script src="js/components/code-viewer.js"></script>
+  <script src="js/components/generators.js"></script>
+  <script src="js/components/templates.js"></script>
+  <script src="js/components/plugins.js"></script>
+  <script src="js/components/settings.js"></script>
+</body>
+</html>
