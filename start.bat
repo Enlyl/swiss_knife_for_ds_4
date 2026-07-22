@@ -1,19 +1,27 @@
 @echo off
 cd /d "%~dp0"
-title AI Project Companion
+title AI Project Companion — http://localhost:8765
 
 echo ========================================
 echo   AI Project Companion
+echo   http://localhost:8765
 echo ========================================
+echo [OK] Запуск сервера...
+
+:: Стартуем сервер в фоне этого окна
+start /B "" python server.py > server.log 2>&1
+
+:: Ждём готовности
+timeout /t 2 /nobreak >nul
+
+:: Открываем браузер
+start "" "http://localhost:8765"
+echo [OK] Браузер открыт
+echo [INFO] Закройте это окно чтобы остановить сервер
 echo.
 
-:: Открываем site напрямую (всегда работает)
-start "" "index.html"
+:: Держим окно открытым — сервер жив, пока открыто это окно
+pause >nul
 
-:: Если есть Python — запускаем сервер в отдельном окне
-python --version >nul 2>&1
-if %errorlevel% equ 0 (
-    echo [OK] Сервер: http://localhost:8765
-    start "AI Server" /MIN python server.py
-    timeout /t 2 /nobreak >nul
-)
+:: Останавливаем сервер при закрытии
+taskkill /f /im python.exe >nul 2>&1
