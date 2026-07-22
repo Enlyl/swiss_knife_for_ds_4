@@ -399,25 +399,15 @@
       html += '</div>';
       html += '<div class="split-view" style="flex:1;display:flex;border-top:1px solid var(--border);overflow:hidden">';
       html += '<div class="split-left" id="inspectorLeft" style="flex:0 0 35%;display:flex;flex-direction:column;padding:0;overflow:hidden">';
-      html += '<div class="tabs" style="display:flex;flex-direction:column;height:100%">';
-      html += '<div class="tab-header">';
-      html += '<button class="tab active" data-tab="files"><i class="fas fa-folder-tree"></i> Файлы</button>';
-      html += '<button class="tab" data-tab="deps"><i class="fas fa-cubes"></i> Зависимости</button>';
-      html += '<button class="tab" data-tab="config"><i class="fas fa-cog"></i> Конфиг</button>';
-      html += '<button class="tab" data-tab="tests"><i class="fas fa-vial"></i> Тесты</button>';
-      html += '</div>';
-      html += '<div class="tab-panel active" data-panel="files" style="flex:1;overflow-y:auto;padding:8px 12px">';
-      html += renderFileTree(structure, 0, '');
-      html += '</div>';
-      html += '<div class="tab-panel" data-panel="deps" style="flex:1;overflow-y:auto;padding:8px 16px;display:none">';
-      html += renderDepsTab(project);
-      html += '</div>';
-      html += '<div class="tab-panel" data-panel="config" style="flex:1;overflow-y:auto;padding:8px 16px;display:none">';
-      html += renderConfigTab(project);
-      html += '</div>';
-      html += '<div class="tab-panel" data-panel="tests" style="flex:1;overflow-y:auto;padding:8px 16px;display:none">';
-      html += renderTestsTab(project);
-      html += '</div>';
+      html += '<div style="flex:1;overflow-y:auto;padding:0">';
+      html += '<div style="padding:10px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px"><i class="fas fa-folder-tree" style="font-size:0.7rem"></i> Файлы</div>';
+      html += '<div style="padding:2px 12px 8px 12px">' + renderFileTree(structure, 0, '') + '</div>';
+      html += '<div style="padding:8px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px"><i class="fas fa-cubes" style="font-size:0.7rem"></i> Зависимости</div>';
+      html += '<div style="padding:2px 12px 8px 12px">' + renderDepsTab(project) + '</div>';
+      html += '<div style="padding:8px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px"><i class="fas fa-cog" style="font-size:0.7rem"></i> Конфиг</div>';
+      html += '<div style="padding:2px 12px 8px 12px">' + renderConfigTab(project) + '</div>';
+      html += '<div style="padding:8px 12px 4px 12px;font-size:0.75rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px"><i class="fas fa-vial" style="font-size:0.7rem"></i> Тесты</div>';
+      html += '<div style="padding:2px 12px 8px 12px">' + renderTestsTab(project) + '</div>';
       html += '</div></div>';
       html += '<div class="split-divider" id="inspectorDivider" style="flex:0 0 5px;cursor:col-resize;background:var(--border);border:none;margin:0;position:relative;z-index:10"></div>';
       html += '<div class="split-right" style="flex:1;padding:16px 20px;overflow-y:auto;min-width:0" id="inspectorFileViewer">';
@@ -436,18 +426,6 @@
           App.router.navigate('#inspector');
         });
       }
-      container.querySelectorAll('.tab').forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          var tabName = this.getAttribute('data-tab');
-          container.querySelectorAll('.tab').forEach(function (t) { t.classList.remove('active'); });
-          this.classList.add('active');
-          container.querySelectorAll('.tab-panel').forEach(function (p) {
-            p.style.display = 'none';
-          });
-          var panel = container.querySelector('.tab-panel[data-panel="' + tabName + '"]');
-          if (panel) panel.style.display = '';
-        });
-      });
       container.querySelectorAll('.tree-folder').forEach(function (folder) {
         folder.addEventListener('click', function () {
           var children = this.nextElementSibling;
